@@ -1,15 +1,12 @@
 require 'forwardable'
 
 class Collection
+  extend Forwardable
+  def_delegators :collection, :size, :select
 
   def initialize
     @collection = ActualCollection.new(@@filters)
   end
-
-  def size
-    @collection.size
-  end
-
 
   private
 
@@ -25,7 +22,7 @@ class Collection
 
   class ActualCollection
     extend Forwardable
-    def_delegators :@collection, :size
+    def_delegators :@collection, :size, :select
     def initialize(filters)
       @filters = filters
       @collection = []
