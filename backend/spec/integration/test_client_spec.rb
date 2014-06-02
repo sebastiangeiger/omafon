@@ -6,6 +6,7 @@ describe "TestClient" do
   it 'connects to the server' do
     client = OmaFon::TestClient.new
     client.run do |ws|
+      p "About to close on my end"
       ws.close
     end
     expect(client.closed?).to be_true
