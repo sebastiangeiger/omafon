@@ -1,6 +1,5 @@
 module OmaFon
   class TestClient
-    attr_reader :messages
     def initialize
       @messages = []
       @was_connected = false
@@ -49,6 +48,14 @@ module OmaFon
 
     def closed?
       @closed
+    end
+
+    def messages
+      @messages.map{|msg| JSON.parse(msg)}
+    end
+
+    def messages_of_type(type)
+      messages.select{|msg| msg["type"] == type}
     end
   end
 end
