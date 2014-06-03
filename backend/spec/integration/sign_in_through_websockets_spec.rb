@@ -2,7 +2,7 @@ require_relative 'spec_helper'
 require 'json'
 require_relative '../../app/models/domain_model'
 
-describe "Sign In" do
+describe "Sign In through websockets" do
   let(:users) { UserCollection.new }
   let(:domain_model) { DomainModel.new(users: users) }
   let(:server) { Server.new }

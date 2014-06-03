@@ -4,7 +4,7 @@ class MessageHandler::User::SignIn < MessageHandler::AbstractHandler
                               password: message[:password])
     if user
       respond({type: 'user/sign_in_successful',
-                   auth_token: SecureRandom.hex(10)})
+               auth_token: SecureRandom.hex(10)})
     else
       respond({type: 'user/sign_in_failed'})
     end
