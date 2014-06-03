@@ -4,11 +4,22 @@ require 'json'
 class Server
   def initialize(mode = :deployment)
     @mode = mode
+    @domain_model = nil
   end
-  def domain_model=(new_model)
-    @domain_model = new_model
+  def start(domain_model)
+    @domain_model = domain_model
+    Thread.abort_on_exception = true
+    @thread = Thread.new { self.send(:run) }
+  end
+  def kill
+    if @thread
+      Thread.kill(@thread)
+    else
+      raise "Thread not set"
+    end
   end
 
+  private
   def run
     EM.run do
       EM::WebSocket.run(:host => "0.0.0.0", :port => 8080) do |ws|

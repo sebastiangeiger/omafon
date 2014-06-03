@@ -1,12 +1,15 @@
 require_relative 'spec_helper'
 
 describe "TestClient" do
-  start_and_stop_server
+  let(:domain_model) { DomainModel.new }
+
+  let(:server) { Server.new }
+  after(:each) { server.kill }
 
   it 'connects to the server' do
+    server.start(domain_model)
     client = OmaFon::TestClient.new
     client.run do |ws|
-      p "About to close on my end"
       ws.close
     end
     expect(client.closed?).to be_true
