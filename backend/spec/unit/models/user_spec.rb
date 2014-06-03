@@ -1,4 +1,4 @@
-require_relative '../../app/models/user'
+require_relative '../../../app/models/user'
 
 describe UserCollection do
   subject(:collection) { UserCollection.new }
