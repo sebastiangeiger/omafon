@@ -1,10 +1,6 @@
 require_relative 'user'
+require_relative '../monkeypatches'
 
-class HashHelper
-  def self.symbolize_keys(hash)
-    hash.each_with_object({}){|(k,v), h| h[k.to_sym] = v}
-  end
-end
 class DomainModel
   attr_reader :outgoing_messages, :users
   def initialize(options = {})
@@ -12,12 +8,12 @@ class DomainModel
     @outgoing_messages = []
   end
   def incoming_message(message)
-    message = HashHelper.symbolize_keys(message)
-    if message[:type] == "user/sign_in"
-      handler = MessageHandler::User::SignIn.new(message,self)
+    message = message.symbolize_keys
+    handler = MessageHandler.get_handler(message).new(message,self)
+    if handler
       @outgoing_messages += handler.execute
     else
-      raise "Don't know this message type"
+      raise 'Unknown Message Type'
     end
   end
   def empty_messages
@@ -26,6 +22,15 @@ class DomainModel
 end
 
 module MessageHandler
+  def self.get_handler(message)
+    module_name = self.message_type_to_module_name(message[:type])
+    module_name.reduce(Module, :const_get)
+  end
+  def self.message_type_to_module_name(type)
+    camelized_type = type.split('/').map{|mod| mod.camelize}
+    ['MessageHandler'] + camelized_type
+  end
+
   module User
     class SignIn
       def initialize(message,domain_model)
@@ -36,10 +41,10 @@ module MessageHandler
         user = users.authenticate(email: message[:email],
                                   password: message[:password])
         if user
-          [{type: "user/sign_in_successful",
+          [{type: 'user/sign_in_successful',
             auth_token: SecureRandom.hex(10)}]
         else
-          [{type: "user/sign_in_failed"}]
+          [{type: 'user/sign_in_failed'}]
         end
       end
       private
