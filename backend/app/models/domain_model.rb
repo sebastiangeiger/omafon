@@ -9,12 +9,8 @@ class DomainModel
   end
   def incoming_message(message)
     message = message.symbolize_keys
-    handler = MessageHandler.get_handler(message).new(message,self)
-    if handler
-      @outgoing_messages += handler.execute
-    else
-      raise 'Unknown Message Type'
-    end
+    handler = MessageHandler.get_handler(message)
+    @outgoing_messages += handler.new(message,self).execute
   end
   def empty_messages
     @outgoing_messages.clear
@@ -23,14 +19,26 @@ end
 
 module MessageHandler
   def self.get_handler(message)
-    module_name = self.message_type_to_module_name(message[:type])
-    module_name.reduce(Module, :const_get)
+    if message and message[:type]
+      module_name = self.message_type_to_module_name(message[:type])
+      begin
+        module_name.reduce(Module, :const_get)
+      rescue NameError => e
+        raise "Handler #{module_name.join('::')} not defined"
+      end
+    else
+      raise 'Type of message is missing'
+    end
   end
+
+  private
   def self.message_type_to_module_name(type)
     camelized_type = type.split('/').map{|mod| mod.camelize}
     ['MessageHandler'] + camelized_type
   end
+end
 
+module MessageHandler
   module User
     class SignIn
       def initialize(message,domain_model)

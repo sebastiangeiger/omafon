@@ -38,10 +38,15 @@ describe DomainModel do
   end
 
   describe 'an unknown message arrives' do
-    it 'raises an error' do
+    it 'no type given raises an error' do
       expect {
         domain_model.incoming_message({})
-      }.to raise_error
+      }.to raise_error('Type of message is missing')
+    end
+    it 'unknown type raises an error' do
+      expect {
+        domain_model.incoming_message({type: 'some/type_here'})
+      }.to raise_error('Handler MessageHandler::Some::TypeHere not defined')
     end
   end
 end
