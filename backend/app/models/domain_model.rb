@@ -11,7 +11,8 @@ class DomainModel
       user = @users.authenticate(email: message["email"],
                                  password: message["password"])
       if user
-        @outgoing_messages << {type: "user/sign_in_successful"}
+        @outgoing_messages << {type: "user/sign_in_successful",
+                               auth_token: SecureRandom.hex(10)}
       else
         @outgoing_messages << {type: "user/sign_in_failed"}
       end

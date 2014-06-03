@@ -21,6 +21,8 @@ describe "Sign In" do
         ws.close_on_message!
       end
       expect(client.messages_of_type("user/sign_in_successful").size).to eql 1
+      message = client.messages_of_type("user/sign_in_successful").first
+      expect(message["auth_token"]).to match /^[a-f0-9]{20}$/
     end
 
     it 'returns a failed message' do
@@ -33,6 +35,8 @@ describe "Sign In" do
         ws.close_on_message!
       end
       expect(client.messages_of_type("user/sign_in_failed").size).to eql 1
+      message = client.messages_of_type("user/sign_in_failed").first
+      expect(message).to_not have_key "auth_token"
     end
   end
 end
