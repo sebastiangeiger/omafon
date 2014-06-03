@@ -19,5 +19,18 @@ module MessageHandler
   end
 end
 
+class MessageHandler::AbstractHandler
+  def initialize(message,domain_model)
+    @message = message
+    @domain_model = domain_model
+  end
+  private
+  def respond(answer)
+    [answer]
+  end
+  def message; @message; end
+  def users; @domain_model.users; end
+end
+
 module MessageHandler::User; end
 require_relative 'user/sign_in'
