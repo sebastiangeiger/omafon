@@ -9,15 +9,19 @@ class DomainModel
     @outgoing_messages = []
   end
   def incoming_message(message)
-    message = message.symbolize_keys
+    process(message.symbolize_keys)
+  end
+  def empty_messages
+    @outgoing_messages.clear
+  end
+
+  private
+  def process(message)
     handler = MessageHandler.get_handler(message)
     new_messages = Guard.with_authentication(handler,message) do
       handler.new(message,self).execute
     end
     @outgoing_messages += new_messages
-  end
-  def empty_messages
-    @outgoing_messages.clear
   end
 
 
