@@ -1,0 +1,6 @@
+language: ruby
+script: 'bundle exec rspec backend'
+before_script: 'cd backend && bundle install'
+rvm:
+  - 2.0.0-p195
+  - ruby-head
