@@ -49,4 +49,23 @@ describe DomainModel do
       }.to raise_error('Handler MessageHandler::Some::TypeHere not defined')
     end
   end
+
+  describe 'protecting a secret' do
+    class MessageHandler::TestSecret < MessageHandler::AbstractHandler
+      def execute
+        respond({type: 'secret_revealed'})
+      end
+    end
+    context 'without an auth token' do
+      let(:retrive_secret_message) do
+        { type: 'test_secret' }
+      end
+      it 'does not reveal the secret' do
+        domain_model.incoming_message(retrive_secret_message)
+        expect(domain_model.outgoing_messages.size).to eql 1
+        message = domain_model.outgoing_messages.first
+        expect(message[:type]).to eql 'error/auth_token_required'
+      end
+    end
+  end
 end

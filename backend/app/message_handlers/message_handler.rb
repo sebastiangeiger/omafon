@@ -1,11 +1,11 @@
 module MessageHandler
   def self.get_handler(message)
     if message and message[:type]
-      module_name = self.message_type_to_module_name(message[:type])
+      class_name = self.message_type_to_class_name(message[:type])
       begin
-        module_name.reduce(Module, :const_get)
+        class_name.reduce(Module, :const_get)
       rescue NameError => e
-        raise "Handler #{module_name.join('::')} not defined"
+        raise "Handler #{class_name.join('::')} not defined"
       end
     else
       raise 'Type of message is missing'
@@ -13,7 +13,7 @@ module MessageHandler
   end
 
   private
-  def self.message_type_to_module_name(type)
+  def self.message_type_to_class_name(type)
     camelized_type = type.split('/').map{|mod| mod.camelize}
     ['MessageHandler'] + camelized_type
   end
@@ -23,6 +23,9 @@ class MessageHandler::AbstractHandler
   def initialize(message,domain_model)
     @message = message
     @domain_model = domain_model
+  end
+  def self.accessible_without_authentication?
+    false
   end
   private
   def respond(answer)
