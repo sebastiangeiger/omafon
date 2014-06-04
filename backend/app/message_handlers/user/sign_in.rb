@@ -6,8 +6,9 @@ class MessageHandler::User::SignIn < MessageHandler::AbstractHandler
     user = users.authenticate(email: message[:email],
                               password: message[:password])
     if user
+      session = sessions.create_session(user: user)
       respond({type: 'user/sign_in_successful',
-               auth_token: SecureRandom.hex(10)})
+               auth_token: session.auth_token})
     else
       respond({type: 'user/sign_in_failed'})
     end

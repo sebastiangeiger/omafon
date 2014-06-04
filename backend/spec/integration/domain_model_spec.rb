@@ -98,7 +98,7 @@ describe DomainModel do
         domain_model.incoming_message({type: 'test_secret', auth_token: invalid_auth_token})
         expect(domain_model.outgoing_messages.size).to eql 1
         message = domain_model.outgoing_messages.first
-        expect(message[:type]).to eql 'error/auth_token_required'
+        expect(message[:type]).to eql 'error/auth_token_invalid'
       end
     end
   end

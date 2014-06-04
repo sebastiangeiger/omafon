@@ -33,6 +33,7 @@ class MessageHandler::AbstractHandler
   end
   def message; @message; end
   def users; @domain_model.users; end
+  def sessions; @domain_model.sessions; end
 end
 
 module MessageHandler::User; end
