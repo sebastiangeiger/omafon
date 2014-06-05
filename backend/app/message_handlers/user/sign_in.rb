@@ -9,6 +9,10 @@ class MessageHandler::User::SignIn < MessageHandler::AbstractHandler
       session = sessions.create_session(user: user)
       respond({type: 'user/sign_in_successful',
                auth_token: session.auth_token})
+      respond({type: 'user/status_changed',
+               user_email: user.email,
+               recipients_exclude: user.email,
+               new_status: "online"})
     else
       respond({type: 'user/sign_in_failed'})
     end

@@ -19,10 +19,11 @@ describe DomainModel do
       let(:password) { 'password' }
       it 'signs in a user' do
         domain_model.incoming_message(sign_in_message)
-        expect(domain_model.outgoing_messages.size).to eql 1
-        message = domain_model.outgoing_messages.first
-        expect(message[:type]).to eql 'user/sign_in_successful'
-        expect(message).to have_key :auth_token
+        sign_in_messages = domain_model.outgoing_messages.select do |msg|
+          msg[:type] == 'user/sign_in_successful'
+        end
+        expect(sign_in_messages.size).to eql 1
+        expect(sign_in_messages.first).to have_key :auth_token
       end
     end
     context 'with the wrong password' do

@@ -23,13 +23,18 @@ class MessageHandler::AbstractHandler
   def initialize(message,domain_model)
     @message = message
     @domain_model = domain_model
+    @response = []
   end
   def self.accessible_without_authentication?
     false
   end
+  def execute_and_return_response
+    execute
+    @response
+  end
   private
-  def respond(answer)
-    [answer]
+  def respond(*answers)
+    @response += answers
   end
   def message; @message; end
   def users; @domain_model.users; end

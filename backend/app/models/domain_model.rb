@@ -21,7 +21,7 @@ class DomainModel
   def process(message)
     handler = MessageHandler.get_handler(message)
     new_messages = Guard.with_authentication(handler,message,sessions) do
-      handler.new(message,self).execute
+      handler.new(message,self).execute_and_return_response
     end
     @outgoing_messages += new_messages
   end
