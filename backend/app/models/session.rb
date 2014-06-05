@@ -14,6 +14,9 @@ class SessionCollection
       @collection[auth_token]
     end
   end
+  def user_emails
+    @collection.values.map(&:user_email)
+  end
 end
 
 class Session
@@ -22,5 +25,9 @@ class Session
   def initialize(options = {})
     @user = options[:user]
     @auth_token = SecureRandom.hex(10)
+  end
+
+  def user_email
+    @user.email
   end
 end

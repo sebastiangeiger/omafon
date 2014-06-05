@@ -40,6 +40,9 @@ On successful sign in an authtoken is issued.
 With the help of an auth token you can access a "secret"
 
 ### 2. Sign in lets user appear on contact list
+Send all signed in users a message that someone logged on
+Don't send that message to the user that just logged on
+Send the newly signed in user a message with the statuses of all other users
 
 ### 3. Closing the websocket connection signs you out
 

@@ -40,6 +40,7 @@ describe DomainModel do
         expect(status_message[:new_status]).to eql "online"
       end
       it 'sends that notification to everyone except the current user' do
+        expect(status_message).to_not have_key :recipients_exclude
         expect(status_message[:recipients]).to eql ["user_b@email.com"]
       end
     end
