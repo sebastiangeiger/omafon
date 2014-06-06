@@ -1,8 +1,8 @@
 require 'securerandom'
 
 class SessionCollection
-  def initialize
-    @collection = {}
+  def initialize(collection = {})
+    @collection = collection
   end
   def create_session(options)
     session = Session.new(options)
@@ -17,17 +17,36 @@ class SessionCollection
   def user_emails
     @collection.values.map(&:user_email)
   end
+  def without(user)
+    new_collection = @collection.reject do |auth_token,session|
+      session.user == user
+    end
+    SessionCollection.new(new_collection)
+  end
+  def online_statuses
+    sessions.map(&:hash_for_public_consumption)
+  end
+  private
+  def sessions
+    @collection.values
+  end
 end
 
 class Session
-  attr_reader :user, :auth_token
+  attr_reader :user, :auth_token, :status
 
   def initialize(options = {})
     @user = options[:user]
     @auth_token = SecureRandom.hex(10)
+    @status = :online
   end
 
   def user_email
     @user.email
+  end
+
+  def hash_for_public_consumption
+    {user_email: user_email,
+     status: status}
   end
 end

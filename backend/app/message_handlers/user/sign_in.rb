@@ -13,6 +13,9 @@ class MessageHandler::User::SignIn < MessageHandler::AbstractHandler
                user_email: user.email,
                recipients_exclude: user.email,
                new_status: "online"})
+      respond({type: 'user/all_statuses',
+               recipient: user.email,
+               users: sessions.without(user).online_statuses })
     else
       respond({type: 'user/sign_in_failed'})
     end

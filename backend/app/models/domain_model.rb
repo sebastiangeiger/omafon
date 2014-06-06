@@ -17,8 +17,11 @@ class DomainModel
   def empty_messages
     @outgoing_messages.clear
   end
-  def outgoing_messages
-    @outgoing_messages.for_sessions(@sessions).to_a
+  def outgoing_messages(options = {})
+    messages = @outgoing_messages
+      .filter(options)
+      .for_sessions(@sessions)
+      .to_a
   end
 
   private
@@ -27,7 +30,7 @@ class DomainModel
     new_messages = Guard.with_authentication(handler,message,sessions) do
       handler.new(message,self).execute_and_return_response
     end
-    @outgoing_messages.add(new_messages)
+    @outgoing_messages.add(Array(new_messages))
   end
 
 
@@ -36,9 +39,9 @@ class DomainModel
       if authentication_sufficient?(handler,message,sessions)
         yield
       elsif not message.has_key? :auth_token
-        [{type: "error/auth_token_required"}]
+        AuthTokenRequiredMessage.new
       else
-        [{type: "error/auth_token_invalid"}]
+        AuthTokenInvalidMessage.new
       end
     end
     def self.authentication_sufficient?(handler,message,sessions)

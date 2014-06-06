@@ -34,7 +34,7 @@ class MessageHandler::AbstractHandler
   end
   private
   def respond(*answers)
-    @response += answers.map{|answer| OutgoingMessage.new(answer)}
+    @response += answers.map{|answer| HandlerCreatedOutgoingMessage.new(answer)}
   end
   def message; @message; end
   def users; @domain_model.users; end
