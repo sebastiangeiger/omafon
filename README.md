@@ -31,21 +31,3 @@ Capture the output of the webcam, show the output on the webpage but also send i
 Extension of example 1, but now B displays A's video and additionally B's video.
 Ideally B's video overlays A's video.
 
-## Roadmap
-### 1. Sign up a user and store his credentials in a database
-This entails project creation and 2 feature tests for positive / negative sign in.
-Don't need a screen for the sign up right now.
-Sign in testing however is done through websockets.
-On successful sign in an authtoken is issued.
-With the help of an auth token you can access a "secret"
-
-### 2. Sign in lets user appear on contact list
-Send all signed in users a message that someone logged on
-Don't send that message to the user that just logged on
-Send the newly signed in user a message with the statuses of all other users
-
-### 3. Closing the websocket connection signs you out
-
-### 4. Users can only see each other when they have a friendship
-
-### 5. Persist state to DB
