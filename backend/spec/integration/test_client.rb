@@ -34,7 +34,7 @@ module OmaFon
     end
 
     def messages
-      @messages.map{|msg| JSON.parse(msg)}
+      @messages
     end
 
     def messages_of_type(type)
@@ -46,17 +46,11 @@ module OmaFon
       EM.run do
         ws = WebSocket::EventMachine::Client.connect(:uri => 'ws://0.0.0.0:8080')
 
-        def ws.close_on_message=(new_value)
-          @close_on_message = new_value
+        def ws.close_if(&block)
+          @close_if_block = block
         end
-        def ws.close_on_message?
-          !!@close_on_message
-        end
-
-        ws.close_on_message = false
-
-        def ws.close_on_message!
-          self.close_on_message = true
+        def ws.close_if_block
+          @close_if_block
         end
 
         ws.onopen do
@@ -65,8 +59,9 @@ module OmaFon
         end
 
         ws.onmessage do |msg, type|
-          @messages << msg
-          if ws.close_on_message?
+          @messages << JSON.parse(msg)
+          types = @messages.map{|msg| msg[:type]}
+          if ws.close_if_block and ws.close_if_block.call(@messages,types)
             ws.close
           end
         end

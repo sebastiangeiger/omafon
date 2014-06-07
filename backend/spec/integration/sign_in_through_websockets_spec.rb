@@ -18,7 +18,10 @@ describe "Sign In through websockets" do
         ws.send(JSON.dump({type: "user/sign_in",
                            email: "some@email.com",
                            password: password}))
-        ws.close_on_message!
+        ws.close_if do |messages,message_types|
+          message_types.include? "user/sign_in_successful" or
+            message_types.include? "user/sign_in_failed"
+        end
       end
     end
 
