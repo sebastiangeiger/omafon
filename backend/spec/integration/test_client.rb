@@ -60,7 +60,7 @@ module OmaFon
 
         ws.onmessage do |msg, type|
           @messages << JSON.parse(msg)
-          types = @messages.map{|msg| msg[:type]}
+          types = @messages.map{|msg| msg["type"]}
           if ws.close_if_block and ws.close_if_block.call(@messages,types)
             ws.close
           end
