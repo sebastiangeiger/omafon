@@ -15,7 +15,7 @@ class SessionCollection
     end
   end
   def user_emails
-    @collection.values.map(&:user_email)
+    sessions.map(&:user_email)
   end
   def without(user)
     new_collection = @collection.reject do |auth_token,session|
