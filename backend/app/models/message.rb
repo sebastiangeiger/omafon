@@ -1,3 +1,5 @@
+require_relative '../my_logger'
+
 class OutgoingMessage
   def initialize
     @content = {}
@@ -59,6 +61,7 @@ end
 class OutgoingMessageQueue
   def initialize
     @messages = []
+    @log = MyLogger.new
   end
   def to_a
     @messages.map(&:to_hash)
@@ -74,9 +77,11 @@ class OutgoingMessageQueue
     self
   end
   def add(new_messages)
+    @log.debug "Added a message: #{new_messages}"
     @messages += new_messages
   end
   def clear
+    @log.debug "Cleared the OutgoingMessageQueue" unless @messages.empty?
     @messages.clear
   end
 end

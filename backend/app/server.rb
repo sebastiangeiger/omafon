@@ -1,11 +1,14 @@
 require_relative 'models/domain_model'
 require 'em-websocket'
 require 'json'
+require_relative 'my_logger'
+
 
 class Server
   def initialize(mode = :deployment)
     @mode = mode
     @domain_model = nil
+    @log = MyLogger.new
   end
   def start(domain_model,options = {})
     @port = options[:port] || 8080
@@ -28,22 +31,29 @@ class Server
 
   private
   def run
+    log = @log
     EM.run do
+      log.debug("Started EventMachine")
       EM::WebSocket.run(:host => "0.0.0.0", :port => @port) do |ws|
+        log.debug("Started WebSocket #{ws.object_id} on port #{@port}")
         open = false
         ws.onopen { |handshake|
+          log.info("Opened a connection in websocket #{ws.object_id}")
           open = true
           ws.send(JSON.dump(type: :welcome))
         }
         ws.onclose {
+          log.info "Closed a connection in websocket #{ws.object_id}"
           open = false
         }
         ws.onmessage { |msg|
+          log.info "Received on #{ws.object_id}: #{msg}"
           @domain_model.incoming_message(JSON.parse(msg))
         }
         check_outgoing_messages = proc {
           if open
             @domain_model.outgoing_messages.each do |msg|
+              log.info "Sending out over #{ws.object_id}: #{msg} "
               ws.send(JSON.dump(msg))
             end
             @domain_model.empty_messages

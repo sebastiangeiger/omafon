@@ -6,10 +6,10 @@ describe "Sign In through websockets" do
   let(:users) { UserCollection.new }
   let(:domain_model) { DomainModel.new(users: users) }
   let(:server) { Server.new }
-  let(:client) { OmaFon::TestClient.new }
   after(:each) { server.kill }
 
   context "with existing user" do
+    let(:client) { OmaFon::TestClient.new }
     before(:each) { users.create_user(email: "some@email.com",
                                       password: "test") }
 
@@ -44,6 +44,27 @@ describe "Sign In through websockets" do
         expect(client.messages_of_type("user/sign_in_failed").size).to eql 1
         message = client.messages_of_type("user/sign_in_failed").first
         expect(message).to_not have_key "auth_token"
+      end
+    end
+  end
+
+  context "with one user already logged in" do
+    let(:user_a) { OmaFon::TestClient.new }
+    let(:user_b) { OmaFon::TestClient.new }
+    before(:each) do
+      users.create_user(email: "user_a@email.com", password: "password_a")
+      users.create_user(email: "user_b@email.com", password: "password_b")
+    end
+
+    def send_login_request(client,client_name,password)
+      client.run do |ws|
+        puts "Started client #{client_name}"
+        ws.send(JSON.dump({type: "user/sign_in",
+                           email: "#{client_name.to_s}@email.com",
+                           password: password}))
+        ws.close_if do |messages,message_types|
+          false
+        end
       end
     end
   end

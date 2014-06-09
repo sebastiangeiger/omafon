@@ -38,7 +38,13 @@ module OmaFon
     end
 
     def messages_of_type(type)
-      messages.select{|msg| msg["type"] == type}
+      if type.is_a? Regexp
+        messages.select{|msg| msg["type"] =~ type}
+      elsif type.is_a? String
+        messages.select{|msg| msg["type"] == type}
+      else
+        raise "Expected String or Regexp"
+      end
     end
 
     private

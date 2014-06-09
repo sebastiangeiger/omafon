@@ -2,7 +2,8 @@ require_relative 'user'
 require_relative 'session'
 require_relative '../monkeypatches'
 require_relative '../message_handlers/message_handler'
-require_relative '../models/message'
+require_relative 'message'
+require_relative '../my_logger'
 
 class DomainModel
   attr_reader :users, :sessions
@@ -10,6 +11,7 @@ class DomainModel
     @users = options[:users] || UserCollection.new
     @sessions = SessionCollection.new
     @outgoing_messages = OutgoingMessageQueue.new
+    @log = MyLogger.new
   end
   def incoming_message(message)
     process(message.symbolize_keys)
