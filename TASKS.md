@@ -11,9 +11,9 @@ Don't need a screen for the sign up right now.
 * [√] Send all signed in users a message that someone logged on
 * [√] Don't send that message to the user that just logged on
 * [√] Send the newly signed in user a message with the statuses of all other users
+* [√] Test this through websockets
 * [ ] Make sure the auth token is only sent to the user that logs in (there's an addressing problem in the system)
 * [ ] More unit tests, better separation of internals (framework) and app logic
-* [ ] Test this through websockets
 
 
 ## 3. Closing the websocket connection signs you out
