@@ -12,18 +12,17 @@ class Server
     @run_in_background = !options[:foreground]
     @domain_model = domain_model
     if @run_in_background
-      Thread.abort_on_exception = true
-      @thread = Thread.new { self.send(:run) }
+      @pid = Process.fork { self.send(:run) }
     else
       puts "Server starting in foreground on port #{@port}..."
       run
     end
   end
   def kill
-    if @thread and @thread.alive?
-      Thread.kill(@thread)
-    elsif @thread.nil?
-      raise "Thread not set"
+    if @pid
+      Process.kill("TERM",@pid)
+    elsif @pid.nil?
+      raise "PID not set"
     end
   end
 
@@ -37,7 +36,6 @@ class Server
           ws.send(JSON.dump(type: :welcome))
         }
         ws.onclose {
-          p "Closed Server"
           open = false
         }
         ws.onmessage { |msg|
