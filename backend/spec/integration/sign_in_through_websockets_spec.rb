@@ -58,7 +58,6 @@ describe "Sign In through websockets" do
 
     def send_login_request(client,client_name,password)
       client.run do |ws|
-        puts "Started client #{client_name}"
         ws.send(JSON.dump({type: "user/sign_in",
                            email: "#{client_name.to_s}@email.com",
                            password: password}))
@@ -67,5 +66,28 @@ describe "Sign In through websockets" do
         end
       end
     end
+
+    # context "with the correct password" do
+    #   it 'returns a successful message' do
+    #     server.start(domain_model)
+    #     t1 = Thread.new { send_login_request(user_a, :user_a, "password_a") }
+    #     tries = 10
+    #     while user_a.messages_of_type(/user\/sign_in_.*/).empty? and tries > 0
+    #       sleep(0.1)
+    #       tries -= 1
+    #     end
+    #     tries = 10
+    #     t2 = Thread.new { send_login_request(user_b, :user_b, "password_b") }
+    #     while user_b.messages_of_type(/user\/sign_in_.*/).empty? and tries > 0
+    #       sleep(0.1)
+    #       tries -= 1
+    #     end
+    #     expect(user_b.messages_of_type("user/sign_in_successful").size).to eql 1
+    #     expect(user_a.messages_of_type("user/sign_in_successful").size).to eql 1
+    #     t1.kill
+    #     t2.kill
+    #   end
+    # end
+
   end
 end
