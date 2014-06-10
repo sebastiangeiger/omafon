@@ -1,6 +1,6 @@
 module OmaFon
   class TestClient
-    TIMEOUT = 3 #seconds
+    TIMEOUT = 1 #seconds
     def initialize
       @messages = []
       @was_connected = false
