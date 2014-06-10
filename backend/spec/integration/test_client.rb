@@ -1,5 +1,6 @@
 module OmaFon
   class TestClient
+    TIMEOUT = 3 #seconds
     def initialize
       @messages = []
       @was_connected = false
@@ -92,6 +93,21 @@ module OmaFon
           end
         }
         EM.next_tick &do_work
+
+        start_time ||= Time.now
+        check_for_timeout = proc {
+          EM.next_tick &check_for_timeout
+          if Time.now > start_time + TIMEOUT
+            error_message = "Timed out while waiting for server (@connected:" \
+                            " #{@connected}, @closed: #{@closed}," \
+                            " @was_connected: #{@was_connected})"
+            ws.close
+            @connected = false
+            @closed = true
+            raise error_message
+          end
+        }
+        EM.next_tick &check_for_timeout
       end
     end
 
