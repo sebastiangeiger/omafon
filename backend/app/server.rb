@@ -37,9 +37,11 @@ class Server
       EM::WebSocket.run(:host => "0.0.0.0", :port => @port) do |ws|
         log.debug("Started WebSocket #{ws.object_id} on port #{@port}")
         open = false
+        connection = nil
         ws.onopen { |handshake|
           log.info("Opened a connection in websocket #{ws.object_id}")
           open = true
+          connection = @domain_model.create_connection
           ws.send(JSON.dump(type: :welcome))
         }
         ws.onclose {
@@ -48,7 +50,7 @@ class Server
         }
         ws.onmessage { |msg|
           log.info "Received on #{ws.object_id}: #{msg}"
-          @domain_model.incoming_message(JSON.parse(msg))
+          connection.incoming_message(JSON.parse(msg))
         }
         check_outgoing_messages = proc {
           if open

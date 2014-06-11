@@ -4,6 +4,7 @@ require_relative '../../app/models/domain_model'
 describe DomainModel do
   let(:user_collection) { UserCollection.new }
   let(:domain_model) { DomainModel.new(users: user_collection) }
+  let(:connection) { domain_model.create_connection }
 
   describe 'Sign in procedure' do
     let(:sign_in_message) do
@@ -19,7 +20,7 @@ describe DomainModel do
     context 'with the correct password' do
       let(:password) { 'password' }
       it 'signs in a user' do
-        domain_model.incoming_message(sign_in_message)
+        connection.incoming_message(sign_in_message)
         sign_in_messages = domain_model.outgoing_messages.select do |msg|
           msg[:type] == 'user/sign_in_successful'
         end
@@ -30,7 +31,7 @@ describe DomainModel do
     context 'with the wrong password' do
       let(:password) { 'wrong_password' }
       it 'signs in a user' do
-        domain_model.incoming_message(sign_in_message)
+        connection.incoming_message(sign_in_message)
         expect(domain_model.outgoing_messages.size).to eql 1
         message = domain_model.outgoing_messages.first
         expect(message[:type]).to eql 'user/sign_in_failed'
@@ -50,7 +51,7 @@ describe DomainModel do
         { type: 'test_secret' }
       end
       it 'does not reveal the secret' do
-        domain_model.incoming_message(retrive_secret_message)
+        connection.incoming_message(retrive_secret_message)
         expect(domain_model.outgoing_messages.size).to eql 1
         message = domain_model.outgoing_messages.first
         expect(message[:type]).to eql 'error/auth_token_required'
@@ -65,7 +66,7 @@ describe DomainModel do
           password: password }
       end
       let(:valid_auth_token) do
-        domain_model.incoming_message(sign_in_message)
+        connection.incoming_message(sign_in_message)
         auth_token = domain_model.outgoing_messages.first[:auth_token]
         domain_model.empty_messages
         auth_token
@@ -78,13 +79,13 @@ describe DomainModel do
                                     password: password)
       end
       it 'does reveal the secret when given the correct auth_token' do
-        domain_model.incoming_message({type: 'test_secret', auth_token: valid_auth_token})
+        connection.incoming_message({type: 'test_secret', auth_token: valid_auth_token})
         expect(domain_model.outgoing_messages.size).to eql 1
         message = domain_model.outgoing_messages.first
         expect(message[:type]).to eql 'secret_revealed'
       end
       it 'does not reveal the secret when given the wrong auth_token' do
-        domain_model.incoming_message({type: 'test_secret', auth_token: invalid_auth_token})
+        connection.incoming_message({type: 'test_secret', auth_token: invalid_auth_token})
         expect(domain_model.outgoing_messages.size).to eql 1
         message = domain_model.outgoing_messages.first
         expect(message[:type]).to eql 'error/auth_token_invalid'

@@ -4,6 +4,7 @@ require_relative '../../app/models/domain_model'
 describe DomainModel do
   let(:user_collection) { UserCollection.new }
   let(:domain_model) { DomainModel.new(users: user_collection) }
+  let(:connection) { domain_model.create_connection }
 
   before(:each) do
     user_collection.create_user(email: 'user_a@email.com',
@@ -16,7 +17,7 @@ describe DomainModel do
     message = { type: 'user/sign_in',
                 email: "#{user.to_s}@email.com",
                 password: 'password' }
-    domain_model.incoming_message(message)
+    connection.incoming_message(message)
   end
 
   before(:each) do
