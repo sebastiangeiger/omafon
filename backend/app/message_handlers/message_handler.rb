@@ -30,7 +30,7 @@ class MessageHandler::AbstractHandler
   end
   private
   def respond(*answers)
-    @response += answers.map{|answer| HandlerCreatedOutgoingMessage.new(answer)}
+    @response += answers
   end
   def message; @message; end
 end

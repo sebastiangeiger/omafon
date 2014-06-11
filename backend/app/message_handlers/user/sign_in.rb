@@ -8,7 +8,8 @@ class MessageHandler::User::SignIn < MessageHandler::AbstractHandler
     if user
       session = sessions.create_session(user: user)
       respond({type: 'user/sign_in_successful',
-               auth_token: session.auth_token})
+               auth_token: session.auth_token,
+               recipient: :current_connection})
       respond({type: 'user/status_changed',
                user_email: user.email,
                recipients_exclude: user.email,

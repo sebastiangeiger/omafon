@@ -7,7 +7,7 @@ class MessageHandlerExecutor
   end
   def execute!
     filtered_message = @authenticator.filter_message(@handler,@message)
-    if filtered_message.is_a? ErrorMessage
+    if filtered_message[:type].start_with?("error/")
       result = filtered_message
     else
       handler_instance = @handler.new(filtered_message)
@@ -18,7 +18,11 @@ class MessageHandlerExecutor
     @outgoing_messages = result
   end
   def outgoing_messages
-    Array(@outgoing_messages)
+    if @outgoing_messages.is_a? Hash
+      [@outgoing_messages]
+    else
+      @outgoing_messages
+    end
   end
   private
   def inject_context(handler)
@@ -43,9 +47,9 @@ class Authenticator
     if authentication_sufficient?(handler,message)
       message.reject{|k| k == :auth_token}
     elsif not message.has_key? :auth_token
-      AuthTokenRequiredMessage.new
+      {type: "error/auth_token_required"}
     else
-      AuthTokenInvalidMessage.new
+      {type: "error/auth_token_invalid"}
     end
   end
 end
