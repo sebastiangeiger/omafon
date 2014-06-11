@@ -46,13 +46,14 @@ class HandlerCreatedOutgoingMessage < OutgoingMessage
   end
 end
 
-class AuthTokenRequiredMessage < OutgoingMessage
+class ErrorMessage < OutgoingMessage; end
+class AuthTokenRequiredMessage < ErrorMessage
   def initialize
     @content = {type: "error/auth_token_required"}
   end
 end
 
-class AuthTokenInvalidMessage < OutgoingMessage
+class AuthTokenInvalidMessage < ErrorMessage
   def to_hash
     {type: "error/auth_token_invalid"}
   end
