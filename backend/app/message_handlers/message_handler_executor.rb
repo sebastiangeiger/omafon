@@ -7,7 +7,7 @@ class MessageHandlerExecutor
     @authenticator = domain_model.authenticator
   end
   def execute!
-    filtered_message = @authenticator.filter_message(@handler,@message)
+    filtered_message = @authenticator.filter_message(@handler,@message,@current_connection)
     if filtered_message[:type].start_with?("error/")
       result = filtered_message
     else
@@ -48,13 +48,13 @@ class Authenticator
       (message.has_key? :auth_token and
        @sessions.find(auth_token: message[:auth_token]))
   end
-  def filter_message(handler,message)
+  def filter_message(handler,message,current_connection)
     if authentication_sufficient?(handler,message)
       message.reject{|k| k == :auth_token}
     elsif not message.has_key? :auth_token
-      {type: "error/auth_token_required"}
+      {type: "error/auth_token_required", recipient: current_connection}
     else
-      {type: "error/auth_token_invalid"}
+      {type: "error/auth_token_invalid", recipient: current_connection}
     end
   end
 end

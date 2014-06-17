@@ -21,9 +21,7 @@ describe DomainModel do
       let(:password) { 'password' }
       it 'signs in a user' do
         connection.incoming_message(sign_in_message)
-        sign_in_messages = domain_model.outgoing_messages.select do |msg|
-          msg[:type] == 'user/sign_in_successful'
-        end
+        sign_in_messages = connection.outgoing_messages(type: 'user/sign_in_successful')
         expect(sign_in_messages.size).to eql 1
         expect(sign_in_messages.first).to have_key :auth_token
       end
@@ -32,8 +30,8 @@ describe DomainModel do
       let(:password) { 'wrong_password' }
       it 'signs in a user' do
         connection.incoming_message(sign_in_message)
-        expect(domain_model.outgoing_messages.size).to eql 1
-        message = domain_model.outgoing_messages.first
+        expect(connection.outgoing_messages.size).to eql 1
+        message = connection.outgoing_messages.first
         expect(message[:type]).to eql 'user/sign_in_failed'
         expect(message).to_not have_key :auth_token
       end
@@ -43,7 +41,7 @@ describe DomainModel do
   describe 'protecting a secret' do
     class MessageHandler::TestSecret < MessageHandler::AbstractHandler
       def execute
-        respond({type: 'secret_revealed'})
+        respond({type: 'secret_revealed', recipient: current_connection})
       end
     end
     context 'without an auth token' do
@@ -52,8 +50,8 @@ describe DomainModel do
       end
       it 'does not reveal the secret' do
         connection.incoming_message(retrive_secret_message)
-        expect(domain_model.outgoing_messages.size).to eql 1
-        message = domain_model.outgoing_messages.first
+        expect(connection.outgoing_messages.size).to eql 1
+        message = connection.outgoing_messages.first
         expect(message[:type]).to eql 'error/auth_token_required'
       end
     end
@@ -67,8 +65,8 @@ describe DomainModel do
       end
       let(:valid_auth_token) do
         connection.incoming_message(sign_in_message)
-        auth_token = domain_model.outgoing_messages.first[:auth_token]
-        domain_model.empty_messages
+        auth_token = connection.outgoing_messages.first[:auth_token]
+        connection.empty_messages
         auth_token
       end
       let(:invalid_auth_token) do
@@ -80,14 +78,14 @@ describe DomainModel do
       end
       it 'does reveal the secret when given the correct auth_token' do
         connection.incoming_message({type: 'test_secret', auth_token: valid_auth_token})
-        expect(domain_model.outgoing_messages.size).to eql 1
-        message = domain_model.outgoing_messages.first
+        expect(connection.outgoing_messages.size).to eql 1
+        message = connection.outgoing_messages.first
         expect(message[:type]).to eql 'secret_revealed'
       end
       it 'does not reveal the secret when given the wrong auth_token' do
         connection.incoming_message({type: 'test_secret', auth_token: invalid_auth_token})
-        expect(domain_model.outgoing_messages.size).to eql 1
-        message = domain_model.outgoing_messages.first
+        expect(connection.outgoing_messages.size).to eql 1
+        message = connection.outgoing_messages.first
         expect(message[:type]).to eql 'error/auth_token_invalid'
       end
     end

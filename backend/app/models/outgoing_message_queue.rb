@@ -30,7 +30,7 @@ class OutgoingMessageQueue
     end
     message
   end
-  def deliver_messages
+  def deliver_messages!
     @messages.each {|msg| deliver_message(msg)}
   end
   def deliver_message(message)

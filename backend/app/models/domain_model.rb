@@ -36,7 +36,7 @@ class DomainModel
     executor = MessageHandlerExecutor.new(handler,message,connection,self)
     executor.execute!
     @outgoing_messages.add(executor.outgoing_messages)
-    @outgoing_messages.deliver_messages
+    @outgoing_messages.deliver_messages!
   end
 
 end
