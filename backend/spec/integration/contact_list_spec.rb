@@ -13,7 +13,7 @@ describe DomainModel do
                                 password: 'password')
   end
 
-  def sign_in(domain_model,user)
+  def sign_in(connection,user)
     message = { type: 'user/sign_in',
                 email: "#{user.to_s}@email.com",
                 password: 'password' }
@@ -21,14 +21,14 @@ describe DomainModel do
   end
 
   before(:each) do
-    sign_in(domain_model, :user_b)
-    domain_model.empty_messages
-    sign_in(domain_model, :user_a)
+    sign_in(connection, :user_b)
+    connection.empty_messages
+    sign_in(connection, :user_a)
   end
 
   describe 'the user/status_changed notification' do
     let(:status_message) do
-      domain_model.
+      connection.
         outgoing_messages(type:"user/status_changed").
         first
     end
@@ -46,7 +46,7 @@ describe DomainModel do
 
   describe 'the user/all_statuses notification' do
     let(:contact_list_message) do
-      domain_model
+      connection
         .outgoing_messages(type:"user/all_statuses")
         .first
     end

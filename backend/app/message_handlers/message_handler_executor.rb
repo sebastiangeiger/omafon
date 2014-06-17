@@ -1,8 +1,9 @@
 class MessageHandlerExecutor
-  def initialize(handler,message,domain_model)
+  def initialize(handler,message,current_connection,domain_model)
     @handler = handler
     @message = message
     @domain_model = domain_model
+    @current_connection = current_connection
     @authenticator = domain_model.authenticator
   end
   def execute!
@@ -26,10 +27,14 @@ class MessageHandlerExecutor
   end
   private
   def inject_context(handler)
-    [:users, :sessions].each do |key|
+    [:users, :sessions, :connections].each do |key|
       variable_name = ('@'+key.to_s).to_sym
       handler.instance_variable_set(variable_name, @domain_model.send(key))
       handler.instance_eval("def #{key}; #{variable_name}; end")
+    end
+    handler.instance_variable_set(:@current_connection, @current_connection)
+    def handler.current_connection
+      @current_connection
     end
   end
 end

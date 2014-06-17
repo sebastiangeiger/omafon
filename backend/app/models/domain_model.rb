@@ -8,7 +8,7 @@ require_relative '../message_handlers/message_handler_executor'
 require_relative '../my_logger'
 
 class DomainModel
-  attr_reader :users, :sessions, :authenticator
+  attr_reader :users, :sessions, :authenticator, :connections
   def initialize(options = {})
     @users = options[:users] || UserCollection.new
     @sessions = SessionCollection.new
@@ -27,15 +27,13 @@ class DomainModel
     @connections.create_connection(self)
   end
   def outgoing_messages(options = {})
-    @outgoing_messages
-      .filter(options)
-      .to_a
+    @outgoing_messages.to_a
   end
 
   private
   def process_incoming_message(message,connection)
     handler = MessageHandler.get_handler(message)
-    executor = MessageHandlerExecutor.new(handler,message,self)
+    executor = MessageHandlerExecutor.new(handler,message,connection,self)
     executor.execute!
     @outgoing_messages.add(executor.outgoing_messages)
   end
