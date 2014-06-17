@@ -39,9 +39,6 @@ describe DomainModel do
       expect(status_message[:user_email]).to eql "user_a@email.com"
       expect(status_message[:new_status]).to eql "online"
     end
-    it 'sends that notification to everyone except the current user' do
-      expect(status_message[:recipients]).to eql ["user_b@email.com"]
-    end
   end
 
   describe 'the user/all_statuses notification' do
@@ -50,9 +47,8 @@ describe DomainModel do
         .outgoing_messages(type:"user/all_statuses")
         .first
     end
-    it 'is sent only to user A' do
+    it 'is sent to user A' do
       expect(contact_list_message).to_not be_nil
-      expect(contact_list_message[:recipients]).to eql ["user_a@email.com"]
     end
     it 'includes users b contact' do
       user_b = {user_email: 'user_b@email.com', status: :online}

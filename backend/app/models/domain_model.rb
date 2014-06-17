@@ -14,7 +14,7 @@ class DomainModel
     @sessions = SessionCollection.new
     @connections = ConnectionCollection.new
     @authenticator = Authenticator.new(@sessions)
-    @outgoing_messages = OutgoingMessageQueue.new(@sessions)
+    @outgoing_messages = OutgoingMessageQueue.new(@sessions,@connections)
     @log = MyLogger.new
   end
   def incoming_message(message,connection)
@@ -36,6 +36,7 @@ class DomainModel
     executor = MessageHandlerExecutor.new(handler,message,connection,self)
     executor.execute!
     @outgoing_messages.add(executor.outgoing_messages)
+    @outgoing_messages.deliver_messages
   end
 
 end
