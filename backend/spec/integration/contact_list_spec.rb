@@ -4,7 +4,8 @@ require_relative '../../app/models/domain_model'
 describe DomainModel do
   let(:user_collection) { UserCollection.new }
   let(:domain_model) { DomainModel.new(users: user_collection) }
-  let(:connection) { domain_model.create_connection }
+  let(:connection_a) { domain_model.create_connection }
+  let(:connection_b) { domain_model.create_connection }
 
   before(:each) do
     user_collection.create_user(email: 'user_a@email.com',
@@ -21,14 +22,14 @@ describe DomainModel do
   end
 
   before(:each) do
-    sign_in(connection, :user_b)
-    connection.empty_messages
-    sign_in(connection, :user_a)
+    sign_in(connection_b, :user_b)
+    connection_b.empty_messages
+    sign_in(connection_a, :user_a)
   end
 
   describe 'the user/status_changed notification' do
     let(:status_message) do
-      connection.
+      connection_b.
         outgoing_messages(type:"user/status_changed").
         first
     end
@@ -43,7 +44,7 @@ describe DomainModel do
 
   describe 'the user/all_statuses notification' do
     let(:contact_list_message) do
-      connection
+      connection_a
         .outgoing_messages(type:"user/all_statuses")
         .first
     end
