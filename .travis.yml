@@ -3,4 +3,6 @@ script: 'bundle exec rspec'
 before_script: 'cd backend && bundle install'
 rvm:
   - 2.0.0-p195
+  - 2.0.0-p481
+  - 2.1.2
   - ruby-head
