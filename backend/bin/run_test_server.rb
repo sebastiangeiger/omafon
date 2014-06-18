@@ -8,4 +8,4 @@ stored_users.each {|user| users.create_user(user)}
 puts "- Loaded #{users.size} users -"
 domain_model = DomainModel.new(users: users)
 server = Server.new
-server.start(domain_model, foreground: true, port: 8888)
+server.start(domain_model, foreground: true, port: 8080)
