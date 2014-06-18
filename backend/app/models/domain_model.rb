@@ -26,9 +26,6 @@ class DomainModel
   def create_connection
     @connections.create_connection(self)
   end
-  def outgoing_messages(options = {})
-    @outgoing_messages.to_a
-  end
 
   private
   def process_incoming_message(message,connection)

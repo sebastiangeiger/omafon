@@ -54,11 +54,11 @@ class Server
         }
         check_outgoing_messages = proc {
           if open
-            @domain_model.outgoing_messages.each do |msg|
+            connection.outgoing_messages.each do |msg|
               log.info "Sending out over #{ws.object_id}: #{msg} "
               ws.send(JSON.dump(msg))
             end
-            @domain_model.empty_messages
+            connection.empty_messages
           end
           EM.next_tick &check_outgoing_messages
         }
