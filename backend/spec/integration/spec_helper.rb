@@ -1,3 +1,4 @@
+require_relative '../spec_helper'
 require_relative 'test_client'
 require_relative '../../app/server.rb'
 require_relative '../../app/models/domain_model'

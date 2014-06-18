@@ -20,20 +20,19 @@ module MessageHandler
 end
 
 class MessageHandler::AbstractHandler
-  def initialize(message,domain_model)
+  attr_reader :response
+  def initialize(message)
     @message = message
-    @domain_model = domain_model
+    @response = []
   end
   def self.accessible_without_authentication?
     false
   end
   private
-  def respond(answer)
-    [answer]
+  def respond(*answers)
+    @response += answers
   end
   def message; @message; end
-  def users; @domain_model.users; end
-  def sessions; @domain_model.sessions; end
 end
 
 module MessageHandler::User; end

@@ -1,5 +1,6 @@
 module OmaFon
   class TestClient
+    TIMEOUT = 1 #seconds
     def initialize
       @messages = []
       @was_connected = false
@@ -34,11 +35,17 @@ module OmaFon
     end
 
     def messages
-      @messages.map{|msg| JSON.parse(msg)}
+      @messages
     end
 
     def messages_of_type(type)
-      messages.select{|msg| msg["type"] == type}
+      if type.is_a? Regexp
+        messages.select{|msg| msg["type"] =~ type}
+      elsif type.is_a? String
+        messages.select{|msg| msg["type"] == type}
+      else
+        raise "Expected String or Regexp"
+      end
     end
 
     private
@@ -46,17 +53,11 @@ module OmaFon
       EM.run do
         ws = WebSocket::EventMachine::Client.connect(:uri => 'ws://0.0.0.0:8080')
 
-        def ws.close_on_message=(new_value)
-          @close_on_message = new_value
+        def ws.close_if(&block)
+          @close_if_block = block
         end
-        def ws.close_on_message?
-          !!@close_on_message
-        end
-
-        ws.close_on_message = false
-
-        def ws.close_on_message!
-          self.close_on_message = true
+        def ws.close_if_block
+          @close_if_block
         end
 
         ws.onopen do
@@ -65,8 +66,9 @@ module OmaFon
         end
 
         ws.onmessage do |msg, type|
-          @messages << msg
-          if ws.close_on_message?
+          @messages << JSON.parse(msg)
+          types = @messages.map{|msg| msg["type"]}
+          if ws.close_if_block and ws.close_if_block.call(@messages,types)
             ws.close
           end
         end
@@ -91,6 +93,21 @@ module OmaFon
           end
         }
         EM.next_tick &do_work
+
+        start_time ||= Time.now
+        check_for_timeout = proc {
+          EM.next_tick &check_for_timeout
+          if Time.now > start_time + TIMEOUT
+            error_message = "Timed out while waiting for server (@connected:" \
+                            " #{@connected}, @closed: #{@closed}," \
+                            " @was_connected: #{@was_connected})"
+            ws.close
+            @connected = false
+            @closed = true
+            raise error_message
+          end
+        }
+        EM.next_tick &check_for_timeout
       end
     end
 

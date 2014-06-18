@@ -1,45 +1,64 @@
+require_relative 'models/domain_model'
 require 'em-websocket'
 require 'json'
+require_relative 'my_logger'
+
 
 class Server
   def initialize(mode = :deployment)
     @mode = mode
     @domain_model = nil
+    @log = MyLogger.new
   end
-  def start(domain_model)
+  def start(domain_model,options = {})
+    @port = options[:port] || 8080
+    @run_in_background = !options[:foreground]
     @domain_model = domain_model
-    Thread.abort_on_exception = true
-    @thread = Thread.new { self.send(:run) }
+    if @run_in_background
+      @pid = Process.fork { self.send(:run) }
+    else
+      puts "Server starting in foreground on port #{@port}..."
+      run
+    end
   end
   def kill
-    if @thread
-      Thread.kill(@thread)
-    else
-      raise "Thread not set"
+    if @pid
+      Process.kill("TERM",@pid)
+    elsif @pid.nil?
+      raise "PID not set"
     end
   end
 
   private
   def run
+    log = @log
     EM.run do
-      EM::WebSocket.run(:host => "0.0.0.0", :port => 8080) do |ws|
+      log.debug("Started EventMachine")
+      EM::WebSocket.run(:host => "0.0.0.0", :port => @port) do |ws|
+        log.debug("Started WebSocket #{ws.object_id} on port #{@port}")
         open = false
+        connection = nil
         ws.onopen { |handshake|
+          log.info("Opened a connection in websocket #{ws.object_id}")
           open = true
+          connection = @domain_model.create_connection
           ws.send(JSON.dump(type: :welcome))
         }
         ws.onclose {
+          log.info "Closed a connection in websocket #{ws.object_id}"
           open = false
         }
         ws.onmessage { |msg|
-          @domain_model.incoming_message(JSON.parse(msg))
+          log.info "Received on #{ws.object_id}: #{msg}"
+          connection.incoming_message(JSON.parse(msg))
         }
         check_outgoing_messages = proc {
           if open
-            @domain_model.outgoing_messages.each do |msg|
+            connection.outgoing_messages.each do |msg|
+              log.info "Sending out over #{ws.object_id}: #{msg} "
               ws.send(JSON.dump(msg))
             end
-            @domain_model.empty_messages
+            connection.empty_messages
           end
           EM.next_tick &check_outgoing_messages
         }
