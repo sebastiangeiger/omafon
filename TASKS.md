@@ -12,14 +12,18 @@ Don't need a screen for the sign up right now.
 * [√] Don't send that message to the user that just logged on
 * [√] Send the newly signed in user a message with the statuses of all other users
 * [√] Test this through websockets
-* [ ] Make sure the auth token is only sent to the user that logs in (there's an addressing problem in the system)
+* [√] Make sure the auth token is only sent to the user that logs in (there's an addressing problem in the system)
+
+## 3. Rudimentary frontend
+* [ ] Read the contacts from a yml file on startup
+* [ ] Login page that signs you in or shows error message
+* [ ] List contacts by email addresses once you're logged in
+
+## 4. Closing the websocket connection signs you out
 * [ ] More unit tests, better separation of internals (framework) and app logic
 
 
-## 3. Closing the websocket connection signs you out
+## 5. Users can only see each other when they have a friendship
 
 
-## 4. Users can only see each other when they have a friendship
-
-
-## 5. Persist state to DB
+## 6. Persist state to DB
