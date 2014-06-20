@@ -12,6 +12,7 @@ function sendCredentials(hash){
 var uiState = {
   state: "notConnected",
   data: {
+    notifications: [],
     loginMessages: []
   },
   callbacks: {
@@ -25,7 +26,7 @@ connection.on("open", function(){
 });
 
 connection.on("user/sign_in_successful", function(event){
-  uiState.data.loginMessages.push(event);
+  uiState.data.notifications.push("Signed In");
   renderOrUpdate(uiState);
 });
 
