@@ -19,7 +19,6 @@ describe "Sign in and see online contacts", type: :feature, js: true do
 
   it 'lets you sign in' do
     visit '/'
-    expect(page).to have_content "WebSocket connected"
     fill_in 'email', :with => 'test@email.com'
     fill_in 'password', :with => 'testing'
     click_on 'Sign in'

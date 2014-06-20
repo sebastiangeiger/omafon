@@ -3,23 +3,6 @@
  */
 var socket = new WebSocket("ws://localhost:8080")
 
-window.onload = function() {
-  var messages = [];
-  renderOrUpdate(messages);
-
-
-  socket.onopen = function (event) {
-    messages.push("WebSocket connected");
-    renderOrUpdate(messages);
-  };
-
-  socket.onmessage = function(event) {
-    console.log(event.data);
-    messages.push(event.data);
-    renderOrUpdate(messages);
-  }
-
-};
 function sendCredentials(hash){
   message = {type: "user/sign_in",
              email: hash.email,
@@ -27,9 +10,37 @@ function sendCredentials(hash){
   socket.send(JSON.stringify(message));
 };
 
-function renderOrUpdate(messages){
+var uiState = {
+  state: "notConnected",
+  data: {
+    loginMessages: []
+  },
+  callbacks: {
+    onCredentialsSubmitted: sendCredentials
+  }
+};
+
+
+window.onload = function() {
+  var messages = [];
+  renderOrUpdate(uiState);
+
+  socket.onopen = function (event) {
+    uiState.state = "connected";
+    renderOrUpdate(uiState);
+  };
+
+  socket.onmessage = function(event) {
+    console.log(event.data);
+    uiState.data.loginMessages.push(event.data);
+    renderOrUpdate(uiState);
+  }
+
+};
+
+function renderOrUpdate(uiState){
   React.renderComponent(
-    <MainUI loginMessages={messages} onCredentialsSubmitted={sendCredentials}/>,
+    <MainUI uiState={uiState}/>,
     document.getElementById('content')
   );
 };
