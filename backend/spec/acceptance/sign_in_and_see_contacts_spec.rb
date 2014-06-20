@@ -23,5 +23,6 @@ describe "Sign in and see online contacts", type: :feature, js: true do
     fill_in 'email', :with => 'test@email.com'
     fill_in 'password', :with => 'testing'
     click_on 'Sign in'
+    expect(page).to have_content "user/sign_in_successful"
   end
 end
