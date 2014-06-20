@@ -29,7 +29,7 @@ function sendCredentials(hash){
 
 function renderOrUpdate(messages){
   React.renderComponent(
-    <LoginWidget loginMessages={messages} onCredentialsSubmitted={sendCredentials}/>,
+    <MainUI loginMessages={messages} onCredentialsSubmitted={sendCredentials}/>,
     document.getElementById('content')
   );
 };
