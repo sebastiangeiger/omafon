@@ -1,13 +1,12 @@
 /**
  * @jsx React.DOM
  */
-var socket = new WebSocket("ws://localhost:8080")
+var socket = new WebSocket("ws://localhost:8080");
+var connection = new ApiConnection(socket);
 
 function sendCredentials(hash){
-  message = {type: "user/sign_in",
-             email: hash.email,
-             password: hash.password};
-  socket.send(JSON.stringify(message));
+  connection.userSignIn({email: hash.email,
+                        password: hash.password});
 };
 
 var uiState = {
@@ -20,22 +19,18 @@ var uiState = {
   }
 };
 
+connection.on("open", function(){
+  uiState.state = "connected";
+  renderOrUpdate(uiState);
+});
+
+connection.on("user/sign_in_successful", function(event){
+  uiState.data.loginMessages.push(event);
+  renderOrUpdate(uiState);
+});
 
 window.onload = function() {
-  var messages = [];
   renderOrUpdate(uiState);
-
-  socket.onopen = function (event) {
-    uiState.state = "connected";
-    renderOrUpdate(uiState);
-  };
-
-  socket.onmessage = function(event) {
-    console.log(event.data);
-    uiState.data.loginMessages.push(event.data);
-    renderOrUpdate(uiState);
-  }
-
 };
 
 function renderOrUpdate(uiState){
