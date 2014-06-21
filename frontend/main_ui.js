@@ -14,6 +14,8 @@ var MainUI = React.createClass({
         return this.renderLogin();
       case "notConnected":
         return this.renderWaitingForConnection();
+      case "authenticated":
+        return this.renderContactList();
       default:
         console.error("Don't know this UI state: " + this.props.uiState.state);
     }
@@ -29,6 +31,11 @@ var MainUI = React.createClass({
       <div>
         <LoginWidget onCredentialsSubmitted={uiState.callbacks.onCredentialsSubmitted}/>
       </div>
+    );
+  },
+  renderContactList: function(){
+    return (
+      <div id="contactList">Contacts</div>
     );
   }
 });

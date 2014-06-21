@@ -27,6 +27,7 @@ connection.on("open", function(){
 
 connection.on("user/sign_in_successful", function(event){
   uiState.data.notifications.push("Signed In");
+  uiState.state = "authenticated";
   renderOrUpdate(uiState);
 });
 

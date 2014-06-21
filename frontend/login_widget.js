@@ -1,8 +1,5 @@
 /** @jsx React.DOM */
 var LoginWidget = React.createClass({
-  getInitialState: function() {
-    return {loginMessages: ["Loginmessages here!"]};
-  },
   handleSubmit: function(){
     var email = this.refs.email.getDOMNode().value.trim();
     var password = this.refs.password.getDOMNode().value.trim();

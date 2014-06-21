@@ -19,9 +19,12 @@ describe "Sign in and see online contacts", type: :feature, js: true do
 
   it 'lets you sign in' do
     visit '/'
+    expect(page).to have_css "#loginWidget"
     fill_in 'email', :with => 'test@email.com'
     fill_in 'password', :with => 'testing'
     click_on 'Sign in'
     expect(page.find("#notifications li")).to have_content "Signed In"
+    expect(page).to have_css "#contactList"
+    expect(page).to_not have_css "#loginWidget"
   end
 end
