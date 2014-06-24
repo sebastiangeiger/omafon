@@ -1,15 +1,19 @@
+require 'logger'
 module OmaFon
   class TestClient
     TIMEOUT = 1 #seconds
-    def initialize
+    def initialize(options = {})
       @messages = []
       @was_connected = false
       @connected = false
       @closed = false
       @executed = false
+      name = options[:name] || "TestClient"
+      @log = TestClient::Logger.new(!!options[:verbose],name)
     end
 
     def run(&block)
+      @log.debug("Running")
       try(&block)
       try_number = 0
       until @executed or try_number > 10
@@ -49,6 +53,10 @@ module OmaFon
     end
 
     private
+    def name
+      @name
+    end
+
     def try(&block)
       EM.run do
         ws = WebSocket::EventMachine::Client.connect(:uri => 'ws://0.0.0.0:8080')
@@ -61,14 +69,17 @@ module OmaFon
         end
 
         ws.onopen do
+          @log.debug("Opened connection")
           @was_connected = true
           @connected = true
         end
 
         ws.onmessage do |msg, type|
+          @log.debug("Received #{msg}")
           @messages << JSON.parse(msg)
           types = @messages.map{|msg| msg["type"]}
           if ws.close_if_block and ws.close_if_block.call(@messages,types)
+            @log.debug("Close block said I am done (#{@messages})")
             ws.close
           end
         end
@@ -76,6 +87,7 @@ module OmaFon
         ws.onclose do
           @closed = true
           @connected = false
+          @log.debug("Closing connection")
           EM.stop
         end
 
@@ -86,8 +98,10 @@ module OmaFon
 
         do_work = proc {
           if @connected and not @executed
+            @log.debug("Executing work block")
             @executed = true
-            block.call(ws)
+            block.call(ws,@log)
+            @log.debug("Done executing block")
           elsif not @executed
             EM.next_tick &do_work
           end
@@ -96,21 +110,48 @@ module OmaFon
 
         start_time ||= Time.now
         check_for_timeout = proc {
-          EM.next_tick &check_for_timeout
-          if Time.now > start_time + TIMEOUT
+          timed_out = Time.now > start_time + TIMEOUT
+          if not @was_connected and timed_out
             error_message = "Timed out while waiting for server (@connected:" \
                             " #{@connected}, @closed: #{@closed}," \
                             " @was_connected: #{@was_connected})"
             ws.close
             @connected = false
             @closed = true
+            @log.fatal(error_message)
             raise error_message
           end
+          EM.next_tick &check_for_timeout
         }
         EM.next_tick &check_for_timeout
       end
     end
 
+    class Logger
+      attr_reader :name
+      def initialize(verbose,name)
+        @log = ::Logger.new(STDOUT)
+        @name = name
+        if verbose
+          @log.level = ::Logger::DEBUG
+        else
+          @log.level = ::Logger::FATAL
+        end
+        debug("Logger online")
+      end
+      def debug(msg)
+        @log.debug(format(msg))
+      end
+      def fatal(msg)
+        @log.fatal(format(msg))
+      end
+      def thread_id
+        Thread.current.object_id.to_s[-4..-1]
+      end
+      def format(msg)
+        "[#{name}] [@#{thread_id}] #{msg}"
+      end
+    end
   end
 end
 

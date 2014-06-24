@@ -14,7 +14,7 @@ describe "Sign In through websockets" do
                                       password: "test") }
 
     def send_login_request(client,password)
-      client.run do |ws|
+      client.run do |ws,logger|
         ws.send(JSON.dump({type: "user/sign_in",
                            email: "some@email.com",
                            password: password}))
@@ -49,45 +49,42 @@ describe "Sign In through websockets" do
   end
 
   context "with one user already logged in" do
-    let(:user_a) { OmaFon::TestClient.new }
-    let(:user_b) { OmaFon::TestClient.new }
+    let(:user_a) { OmaFon::TestClient.new(name: "User A", verbose: false) }
+    let(:user_b) { OmaFon::TestClient.new(name: "User B", verbose: false) }
     before(:each) do
       users.create_user(email: "user_a@email.com", password: "password_a")
       users.create_user(email: "user_b@email.com", password: "password_b")
     end
 
-    def send_login_request(client,client_name,password)
-      client.run do |ws|
-        ws.send(JSON.dump({type: "user/sign_in",
-                           email: "#{client_name.to_s}@email.com",
-                           password: password}))
+    def send_login_request(client,client_name,password,end_message)
+      client.run do |ws,log|
+        message = {type: "user/sign_in",
+                   email: "#{client_name.to_s}@email.com",
+                   password: password}
+        log.debug("Sending #{message}")
+        ws.send(JSON.dump(message))
         ws.close_if do |messages,message_types|
-          false
+          message_types.include? end_message or
+            message_types.include? "user/sign_in_failed"
         end
       end
     end
 
-    # context "with the correct password" do
-    #   it 'returns a successful message' do
-    #     server.start(domain_model)
-    #     t1 = Thread.new { send_login_request(user_a, :user_a, "password_a") }
-    #     tries = 10
-    #     while user_a.messages_of_type(/user\/sign_in_.*/).empty? and tries > 0
-    #       sleep(0.1)
-    #       tries -= 1
-    #     end
-    #     tries = 10
-    #     t2 = Thread.new { send_login_request(user_b, :user_b, "password_b") }
-    #     while user_b.messages_of_type(/user\/sign_in_.*/).empty? and tries > 0
-    #       sleep(0.1)
-    #       tries -= 1
-    #     end
-    #     expect(user_b.messages_of_type("user/sign_in_successful").size).to eql 1
-    #     expect(user_a.messages_of_type("user/sign_in_successful").size).to eql 1
-    #     t1.kill
-    #     t2.kill
-    #   end
-    # end
+    it 'introduces the users to each other' do
+      server.start(domain_model)
+      t1 = Thread.new do
+        send_login_request(user_a, :user_a, "password_a", "user/status_changed")
+      end
+      sleep(1)
+      t2 = Thread.new do
+        send_login_request(user_b, :user_b, "password_b", "user/all_statuses")
+      end
+      sleep(1)
+      expect(user_b.messages_of_type("user/all_statuses").size).to eql 1
+      expect(user_a.messages_of_type("user/all_statuses").size).to eql 1
+      expect(user_b.messages_of_type("user/status_changed").size).to eql 0
+      expect(user_a.messages_of_type("user/status_changed").size).to eql 1
+    end
 
   end
 end

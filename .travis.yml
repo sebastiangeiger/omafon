@@ -1,5 +1,5 @@
 language: ruby
-script: 'bundle exec rspec'
+script: './run_tests.sh'
 before_script: 'cd backend && bundle install'
 rvm:
   - 2.0.0-p195
