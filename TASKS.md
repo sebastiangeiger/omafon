@@ -19,14 +19,17 @@ Don't need a screen for the sign up right now.
 * [√] Login page that signs you in or shows error message
 * [√] List contacts by email addresses once you're logged in
 
-## 4. Closing the websocket connection signs you out
-* [ ] More unit tests, better separation of internals (framework) and app logic
+## 4. Closing the websocket connection marks you as offline
+* [ ] Start with an integration test
 
 
 ## 5. Users can only see each other when they have a friendship
+* [ ] More unit tests, better separation of internals (framework) and app logic
 
 
 ## 6. Persist state to DB
+
+## 7. Stay authenticated by storing auth token in client
 
 
 ## Known Defects
