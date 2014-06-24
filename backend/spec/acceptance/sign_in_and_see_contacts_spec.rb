@@ -33,22 +33,23 @@ describe "Sign in and see online contacts", type: :feature, js: true do
 
   context 'with another user already signed in' do
     let(:client) do
-      client = OmaFon::TestClient.new
-      client.run do |socket|
-        socket.send(JSON.dump({type: "user/sign_in",
-                               email: "other_user@email.com",
-                               password: "other"}))
-      end
-      client
+      client = OmaFon::TestClient.new({verbose: true})
     end
     it 'shows that user in the contacts' do
-      wait_until(client).has_received("user/sign_in_successful") do
-        visit '/'
-        fill_in 'email', :with => 'test@email.com'
-        fill_in 'password', :with => 'testing'
-        click_on 'Sign in'
-        expect(page.find("#contactList")).to have_content "other_user@email.com"
+      thread = Thread.new do
+        client.run do |socket|
+          socket.send(JSON.dump({type: "user/sign_in",
+                                 email: "other_user@email.com",
+                                 password: "other"}))
+        end
       end
+      sleep(1)
+      visit '/'
+      fill_in 'email', :with => 'test@email.com'
+      fill_in 'password', :with => 'testing'
+      click_on 'Sign in'
+      expect(page.find("#contactList")).to have_content "other_user@email.com"
+      thread.kill
     end
   end
 end
