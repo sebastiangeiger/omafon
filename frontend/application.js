@@ -32,6 +32,12 @@ connection.on("user/sign_in_successful", function(event){
   renderOrUpdate(uiState);
 });
 
+connection.on("user/sign_in_failed", function(event){
+  uiState.data.loginMessages.push("Wrong email/password combination");
+  uiState.state = "connected";
+  renderOrUpdate(uiState);
+});
+
 connection.on("user/all_statuses", function(event){
   user_emails = _.map(event.users, function(user) {
     return user.user_email;

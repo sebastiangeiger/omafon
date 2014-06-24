@@ -15,9 +15,9 @@ Don't need a screen for the sign up right now.
 * [√] Make sure the auth token is only sent to the user that logs in (there's an addressing problem in the system)
 
 ## 3. Rudimentary frontend
-* [ ] Read the contacts from a yml file on startup
-* [ ] Login page that signs you in or shows error message
-* [ ] List contacts by email addresses once you're logged in
+* [√] Read the contacts from a yml file on startup
+* [√] Login page that signs you in or shows error message
+* [√] List contacts by email addresses once you're logged in
 
 ## 4. Closing the websocket connection signs you out
 * [ ] More unit tests, better separation of internals (framework) and app logic
@@ -27,3 +27,8 @@ Don't need a screen for the sign up right now.
 
 
 ## 6. Persist state to DB
+
+
+## Known Defects
+* [ ] Integration / Acceptance tests using concurrent TestClients are timing dependent
+* [ ] Running two acceptance tests together fails because of PhantomJS

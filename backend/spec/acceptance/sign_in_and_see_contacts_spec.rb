@@ -20,15 +20,26 @@ describe "Sign in and see online contacts", type: :feature, js: true do
     server.start(domain_model)
   end
 
-  it 'lets you sign in' do
+  it 'lets you sign in with the right password' do
     visit '/'
     expect(page).to have_css "#loginWidget"
     fill_in 'email', :with => 'test@email.com'
     fill_in 'password', :with => 'testing'
     click_on 'Sign in'
-    expect(page.find("#notifications li")).to have_content "Signed In"
+    expect(page.find("#notifications")).to have_content "Signed In"
     expect(page).to have_css "#contactList"
     expect(page).to_not have_css "#loginWidget"
+  end
+
+  it 'turns you down with the wrong password' do
+    visit '/'
+    expect(page).to have_css "#loginWidget"
+    fill_in 'email', :with => 'test@email.com'
+    fill_in 'password', :with => 'wrongpassword'
+    click_on 'Sign in'
+    expect(page).to_not have_css "#contactList"
+    expect(page).to have_css "#loginWidget"
+    expect(page).to have_content "Wrong email/password combination"
   end
 
   context 'with another user already signed in' do

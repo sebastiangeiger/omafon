@@ -28,7 +28,7 @@ var MainUI = React.createClass({
   renderLogin: function(){
     var uiState = this.props.uiState;
     return (
-      <LoginWidget onCredentialsSubmitted={uiState.callbacks.onCredentialsSubmitted}/>
+      <LoginWidget onCredentialsSubmitted={uiState.callbacks.onCredentialsSubmitted} loginMessages={uiState.data.loginMessages} />
     );
   },
   renderContactList: function(){
