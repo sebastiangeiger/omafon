@@ -13,7 +13,8 @@ var uiState = {
   state: "notConnected",
   data: {
     notifications: [],
-    loginMessages: []
+    loginMessages: [],
+    onlineContacts: []
   },
   callbacks: {
     onCredentialsSubmitted: sendCredentials
@@ -28,6 +29,14 @@ connection.on("open", function(){
 connection.on("user/sign_in_successful", function(event){
   uiState.data.notifications.push("Signed In");
   uiState.state = "authenticated";
+  renderOrUpdate(uiState);
+});
+
+connection.on("user/all_statuses", function(event){
+  user_emails = _.map(event.users, function(user) {
+    return user.user_email;
+  });
+  uiState.data.onlineContacts = user_emails;
   renderOrUpdate(uiState);
 });
 

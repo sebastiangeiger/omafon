@@ -28,14 +28,12 @@ var MainUI = React.createClass({
   renderLogin: function(){
     var uiState = this.props.uiState;
     return (
-      <div>
-        <LoginWidget onCredentialsSubmitted={uiState.callbacks.onCredentialsSubmitted}/>
-      </div>
+      <LoginWidget onCredentialsSubmitted={uiState.callbacks.onCredentialsSubmitted}/>
     );
   },
   renderContactList: function(){
     return (
-      <div id="contactList">Contacts</div>
+      <ContactList onlineContacts={uiState.data.onlineContacts}/>
     );
   }
 });
