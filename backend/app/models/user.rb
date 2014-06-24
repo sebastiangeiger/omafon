@@ -1,3 +1,4 @@
+require 'securerandom'
 require_relative 'collection'
 
 class UserCollection < Collection
