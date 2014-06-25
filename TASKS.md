@@ -30,6 +30,9 @@ Don't need a screen for the sign up right now.
 ## 6. Persist state to DB
 
 ## 7. Stay authenticated by storing auth token in client
+* [ ] Skip the login screen
+* [ ] Add check for authentication when establishing connection
+* [ ] Destroy the auth token when the client signs out (server and client)
 
 
 ## Known Defects

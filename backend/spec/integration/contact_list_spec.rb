@@ -62,4 +62,29 @@ describe "The contact list" do
       end
     end
   end
+
+  context 'when user_a and user_b are both online, and then user_b goes offline' do
+    before(:each) do
+      sign_in(connection_b, :user_b)
+      connection_b.empty_messages
+      sign_in(connection_a, :user_a)
+      connection_a.empty_messages
+      connection_b.close
+    end
+
+    describe 'the user/status_changed notification for user_a' do
+      let(:status_changed) do
+        connection_a.
+          outgoing_messages(type:"user/status_changed").
+          first
+      end
+      it 'is sent' do
+        expect(status_changed).to_not be_nil
+      end
+      it 'includes users B email address' do
+        expect(status_changed[:user_email]).to eql "user_b@email.com"
+        expect(status_changed[:new_status]).to eql "offline"
+      end
+    end
+  end
 end
