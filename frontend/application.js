@@ -46,6 +46,13 @@ connection.on("user/all_statuses", function(event){
   renderOrUpdate(uiState);
 });
 
+connection.on("user/status_changed", function(event){
+  if(event.new_status === "online"){
+    uiState.data.onlineContacts.push(event.user_email);
+  }
+  renderOrUpdate(uiState);
+});
+
 window.onload = function() {
   renderOrUpdate(uiState);
 };
