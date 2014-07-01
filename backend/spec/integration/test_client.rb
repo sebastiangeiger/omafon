@@ -67,6 +67,13 @@ module OmaFon
         def ws.close_if_block
           @close_if_block
         end
+        def ws.check_for_close(messages,log)
+          types = messages.map{|msg| msg["type"]}
+          if close_if_block and close_if_block.call(messages,types)
+            log.debug("Close block said I am done (#{messages})")
+            close
+          end
+        end
 
         ws.onopen do
           @log.debug("Opened connection")
@@ -77,11 +84,7 @@ module OmaFon
         ws.onmessage do |msg, type|
           @log.debug("Received #{msg}")
           @messages << JSON.parse(msg)
-          types = @messages.map{|msg| msg["type"]}
-          if ws.close_if_block and ws.close_if_block.call(@messages,types)
-            @log.debug("Close block said I am done (#{@messages})")
-            ws.close
-          end
+          ws.check_for_close(@messages,@log)
         end
 
         ws.onclose do
@@ -108,22 +111,11 @@ module OmaFon
         }
         EM.next_tick &do_work
 
-        start_time ||= Time.now
-        check_for_timeout = proc {
-          timed_out = Time.now > start_time + TIMEOUT
-          if not @was_connected and timed_out
-            error_message = "Timed out while waiting for server (@connected:" \
-                            " #{@connected}, @closed: #{@closed}," \
-                            " @was_connected: #{@was_connected})"
-            ws.close
-            @connected = false
-            @closed = true
-            @log.fatal(error_message)
-            raise error_message
-          end
-          EM.next_tick &check_for_timeout
+        check_for_close = proc {
+          ws.check_for_close(@messages,@log)
+          EM.next_tick &check_for_close
         }
-        EM.next_tick &check_for_timeout
+        EM.next_tick &check_for_close
       end
     end
 

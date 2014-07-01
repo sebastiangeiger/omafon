@@ -51,7 +51,10 @@ connection.on("user/status_changed", function(event){
   if(event.new_status === "online"){
     uiState.data.onlineContacts.push(event.user_email);
   } else {
-    console.log("BINGO!!");
+    var index = uiState.data.onlineContacts.indexOf(event.user_email);
+    if (index > -1) {
+      uiState.data.onlineContacts.splice(index, 1);
+    }
   }
   renderOrUpdate(uiState);
 });

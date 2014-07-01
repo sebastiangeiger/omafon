@@ -56,5 +56,5 @@ Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, phantomjs_logger: WarningSuppressor)
 end
 Capybara.javascript_driver = :poltergeist
-Capybara.default_wait_time = 10
+Capybara.default_wait_time = 15
 
