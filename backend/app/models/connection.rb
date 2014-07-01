@@ -18,7 +18,9 @@ class ConnectionCollection
   end
   def register_session(options)
     email = options[:session].user_email
-    @connected_sessions[email] = options[:connection]
+    connection = options[:connection]
+    connection.identifier = email if connection.respond_to?(:identifier=)
+    @connected_sessions[email] = connection
   end
   def find_session(desired_connection)
     @connected_sessions.select do |email,connection|
@@ -29,13 +31,14 @@ class ConnectionCollection
     if recipient.is_a? Connection
       recipient
     else
-      @connected_sessions[recipient] || NoConnection.new
+      @connected_sessions[recipient] || NoConnection.new(recipient)
     end
   end
 end
 
 class Connection
   #TODO: Connection should not know of domain_model, use Observable instead
+  attr_writer :identifier
   include Observable
   def initialize(domain_model)
     @domain_model = domain_model
@@ -47,7 +50,7 @@ class Connection
   end
   def empty_messages
     unless @outgoing_messages.empty?
-      @log.debug("Emptying messages in #{self}")
+      @log.debug("Emptying messages in #{identifier}")
       @outgoing_messages.clear
     end
   end
@@ -55,19 +58,32 @@ class Connection
     @outgoing_messages.select{|msg| HashObject.new(msg).fits_criteria?(options)}
   end
   def queue_message(message)
-    @log.debug("Adding message: #{message} to #{self}")
+    @log.debug("Adding message: #{message} to #{identifier}")
     @outgoing_messages << message
   end
   def close
+    @log.debug("Closing #{identifier}")
     trigger(:close)
+  end
+  def identifier
+    if @identifier
+      "<Connection for #{@identifier} (#{self.object_id})>"
+    else
+      self
+    end
   end
 end
 
 class NoConnection
-  def initialize
+  def initialize(desired_recipient = nil)
     @log = MyLogger.new
+    @desired_recipient = desired_recipient
   end
   def queue_message(message)
-    @log.debug("Discarding #{message}, connection does not exist")
+    @log.debug("Discarding #{message} to '#{desired_recipient}', connection does not exist")
+  end
+  private
+  def desired_recipient
+    @desired_recipient || "[unnamed recipient]"
   end
 end

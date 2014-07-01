@@ -12,7 +12,7 @@ class Postmaster
     new_messages.map! do |message|
       correct_recipients(message.to_hash)
     end
-    @log.debug "Added messages: #{new_messages}"
+    @log.debug "Added #{new_messages.count} messages"
     @messages += new_messages
   end
 

@@ -87,7 +87,7 @@ module OmaFon
         ws.onclose do
           @closed = true
           @connected = false
-          @log.debug("Closing connection")
+          @log.debug("TestClient received onclose event")
           EM.stop
         end
 
