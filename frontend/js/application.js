@@ -47,8 +47,11 @@ connection.on("user/all_statuses", function(event){
 });
 
 connection.on("user/status_changed", function(event){
+  console.log(event.user_email + " is now " + event.new_status);
   if(event.new_status === "online"){
     uiState.data.onlineContacts.push(event.user_email);
+  } else {
+    console.log("BINGO!!");
   }
   renderOrUpdate(uiState);
 });
