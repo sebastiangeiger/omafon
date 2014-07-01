@@ -12,8 +12,8 @@ describe "TestClient" do
     client.run do |ws|
       ws.close
     end
-    expect(client.closed?).to be_true
-    expect(client.connected?).to be_false
-    expect(client.was_connected?).to be_true
+    expect(client.closed?).to be true
+    expect(client.connected?).to be false
+    expect(client.was_connected?).to be true
   end
 end
