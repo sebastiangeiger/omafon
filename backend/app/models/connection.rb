@@ -1,5 +1,6 @@
 require_relative '../helper/hash_object'
 require_relative '../helper/observable'
+require_relative '../my_logger'
 
 class ConnectionCollection
   include Observable
@@ -28,30 +29,45 @@ class ConnectionCollection
     if recipient.is_a? Connection
       recipient
     else
-      @connected_sessions[recipient]
+      @connected_sessions[recipient] || NoConnection.new
     end
   end
 end
 
 class Connection
+  #TODO: Connection should not know of domain_model, use Observable instead
   include Observable
   def initialize(domain_model)
     @domain_model = domain_model
     @outgoing_messages = []
+    @log = MyLogger.new
   end
   def incoming_message(message)
     @domain_model.incoming_message(message,self)
   end
   def empty_messages
-    @outgoing_messages.clear
+    unless @outgoing_messages.empty?
+      @log.debug("Emptying messages in #{self}")
+      @outgoing_messages.clear
+    end
   end
   def outgoing_messages(options = {})
     @outgoing_messages.select{|msg| HashObject.new(msg).fits_criteria?(options)}
   end
   def queue_message(message)
+    @log.debug("Adding message: #{message} to #{self}")
     @outgoing_messages << message
   end
   def close
     trigger(:close)
+  end
+end
+
+class NoConnection
+  def initialize
+    @log = MyLogger.new
+  end
+  def queue_message(message)
+    @log.debug("Discarding #{message}, connection does not exist")
   end
 end
