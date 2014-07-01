@@ -27,7 +27,10 @@ class Postmaster
   end
 
   def deliver_messages!
-    @messages.each {|msg| deliver_message(msg)}
+    unless @messages.empty?
+      @messages.each {|msg| deliver_message(msg)}
+      @messages.clear
+    end
   end
 
   def deliver_message(message)
