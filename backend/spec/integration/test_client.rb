@@ -71,7 +71,8 @@ module OmaFon
           types = messages.map{|msg| msg["type"]}
           if close_if_block and close_if_block.call(messages,types)
             log.debug("Close block said I am done (#{messages})")
-            close
+            self.close
+            EM.stop
           end
         end
 
