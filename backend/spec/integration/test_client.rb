@@ -10,6 +10,7 @@ module OmaFon
       @executed = false
       name = options[:name] || "TestClient"
       @log = TestClient::Logger.new(!!options[:verbose],name)
+      @log.debug("Created new client")
     end
 
     def run(&block)
@@ -91,7 +92,7 @@ module OmaFon
         ws.onclose do
           @closed = true
           @connected = false
-          @log.debug("TestClient received onclose event")
+          @log.debug("TestClient received onclose event; Stopping EM")
           EM.stop
         end
 
