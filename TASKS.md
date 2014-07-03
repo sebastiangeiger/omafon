@@ -20,19 +20,26 @@ Don't need a screen for the sign up right now.
 * [√] List contacts by email addresses once you're logged in
 
 ## 4. Closing the websocket connection marks you as offline
-* [ ] Start with an integration test
+* [√] Start with an integration test
+* [√] Acceptance test works
 
 
-## 5. Users can only see each other when they have a friendship
-* [ ] More unit tests, better separation of internals (framework) and app logic
-
-
-## 6. Persist state to DB
-
-## 7. Stay authenticated by storing auth token in client
+## 5. Stay authenticated by storing auth token in client
 * [ ] Skip the login screen
 * [ ] Add check for authentication when establishing connection
 * [ ] Destroy the auth token when the client signs out (server and client)
+
+## 6. Good looking frontend
+* [ ] Loading indicators
+* [ ] Sign in screen and notifications
+* [ ] Ways to edit your profile (after being created by admin)
+* [ ] Contacts with profile pictures
+* [ ] Animations when contacts go offline
+
+## 7. Users can only see each other when they have a friendship
+* [ ] More unit tests, better separation of internals (framework) and app logic
+
+## 8. Persist state to DB
 
 
 ## Known Defects
