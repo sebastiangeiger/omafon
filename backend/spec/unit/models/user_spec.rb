@@ -47,7 +47,7 @@ describe User do
   end
   describe '#password' do
     before(:each) {
-      SecureRandom.stub(:hex).and_return "50a2ca75ce886df16a38"
+      allow(SecureRandom).to receive(:hex).and_return "50a2ca75ce886df16a38"
     }
     it 'sets a salt' do
       expect(valid_user.salt).to eql "50a2ca75ce886df16a38"

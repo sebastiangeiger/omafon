@@ -39,23 +39,24 @@ class Server
         open = false
         connection = nil
         ws.onopen { |handshake|
-          log.info("Opened a connection in websocket #{ws.object_id}")
           open = true
           connection = @domain_model.create_connection
+          log.info("Opened a connection in websocket #{connection.identifier}")
           ws.send(JSON.dump(type: :welcome))
         }
         ws.onclose {
-          log.info "Closed a connection in websocket #{ws.object_id}"
+          log.info "Closed connection in websocket #{connection.identifier}"
+          connection.close
           open = false
         }
         ws.onmessage { |msg|
-          log.info "Received on #{ws.object_id}: #{msg}"
+          log.info "Received on #{connection.object_id}: #{msg}"
           connection.incoming_message(JSON.parse(msg))
         }
         check_outgoing_messages = proc {
           if open
             connection.outgoing_messages.each do |msg|
-              log.info "Sending out over #{ws.object_id}: #{msg} "
+              log.info "Sending out over #{connection.identifier}: #{msg} "
               ws.send(JSON.dump(msg))
             end
             connection.empty_messages

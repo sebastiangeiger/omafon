@@ -11,10 +11,10 @@ var LoginWidget = React.createClass({
       <div id="loginWidget">
         <form id="login" onSubmit={this.handleSubmit}>
 
-          <label for="email">E-mail:</label>
+          <label htmlFor="email">E-mail:</label>
           <input type="text" name="email" id="email" ref="email"/>
 
-          <label for="password">Password:</label>
+          <label htmlFor="password">Password:</label>
           <input type="password" name="password" ref="password"/>
 
           <input type="submit" value="Sign in"/>

@@ -2,7 +2,7 @@
 var MainUI = React.createClass({
   render: function() {
     return(
-      <div class="content">
+      <div className="content">
         <Notifications messages={this.props.uiState.data.notifications}/>
         {this.renderContent()}
       </div>

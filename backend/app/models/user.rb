@@ -1,5 +1,6 @@
 require 'securerandom'
 require_relative 'collection'
+require 'securerandom'
 
 class UserCollection < Collection
   validates_uniqueness_of :email

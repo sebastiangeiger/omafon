@@ -19,7 +19,7 @@ var ContactList = React.createClass({
 var ContactListRow = React.createClass({
   render: function() {
     return (
-      <li class="contact">{this.props.contact}</li>
+      <li className="contact">{this.props.contact}</li>
     );
   }
 });

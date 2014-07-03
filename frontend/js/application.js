@@ -46,6 +46,19 @@ connection.on("user/all_statuses", function(event){
   renderOrUpdate(uiState);
 });
 
+connection.on("user/status_changed", function(event){
+  console.log(event.user_email + " is now " + event.new_status);
+  if(event.new_status === "online"){
+    uiState.data.onlineContacts.push(event.user_email);
+  } else {
+    var index = uiState.data.onlineContacts.indexOf(event.user_email);
+    if (index > -1) {
+      uiState.data.onlineContacts.splice(index, 1);
+    }
+  }
+  renderOrUpdate(uiState);
+});
+
 window.onload = function() {
   renderOrUpdate(uiState);
 };

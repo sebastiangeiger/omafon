@@ -18,6 +18,7 @@ function ApiConnection(socket){
     _self._trigger(event);
   };
   socket.onmessage = function (event) {
+    console.log("Client received: " + event.data);
     var message = JSON.parse(event.data);
     _self._trigger(message);
   };
